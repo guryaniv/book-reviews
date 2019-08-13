@@ -16,10 +16,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
+def import_books(csv_path):
+    """import books from a csv file to the database
+    The file should contain isbn,title,author,year"""
+    # TODO
+
 def main():
     """create all database tables according to models"""
     db.create_all()
-    # TODO: import books from csv
+    # import_books("books.csv") TODO
 
 if __name__ == "__main__":
     with app.app_context():
