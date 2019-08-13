@@ -42,3 +42,5 @@ def load_user(user_id):
     # It should return None if the ID is not valid.
     # (In that case, the ID will manually be removed from the session and processing will continue.
     return User.query.get(int(user_id))
+
+# class

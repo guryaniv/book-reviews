@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request
+from flask import Flask
 from .models import *
 
 os.environ[
@@ -17,7 +17,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 def main():
+    """create all database tables according to models"""
     db.create_all()
+    # TODO: import books from csv
 
 if __name__ == "__main__":
     with app.app_context():
