@@ -47,25 +47,58 @@ def load_user(user_id):
 
 class Book(db.Model):
     __tablename__ = "books"
-    id = db.Column(db.Integer, primary_key=True)
+    isbn = db.Column(db.String, primary_key=True)   # ISBN can contain X, not only numbers
     title = db.Column(db.String, nullable=False)
     author = db.Column(db.String, nullable=False)
-    isbn = db.Column(db.Integer)    # could be null if book only exists in our app and not in goodreads
     year = db.Column(db.Integer)
     review_count = db.Column(db.Integer)
-    average_score = db.Column(db.Integer)
+    average_score = db.Column(db.Float)
     gr_review_count = db.Column(db.Integer)
-    gr_average_score = db.Column(db.Integer)
+    gr_average_score = db.Column(db.Float)
+    reviews = db.relationship("Review", backref="book", lazy=True)
 
-    def __init__(self, title, author, isbn=None, year=None):
+    def __init__(self, isbn, title, author, year=None):
         # self.id   # get when inserted to db
+        self.isbn = isbn
         self.title = title
         self.author = author
-        self.isbn = isbn
         self.year = year
         self.review_count = 0   # no reviews on our site initially
-        self.average_score = 0  # no reviews on our site initially
+        self.sum_of_scores = 0
+        self.average_score = 0
         self.gr_review_count, self.gr_average_score = get_gr_reviews_data(isbn)
+
+    def add_review(self, user_id, score, text):
+        """Add a review for this book object"""
+        new_review = Review(book_id=self.id, user_id=user_id, score=score, text=text)
+        db.session.add(new_review)
+        db.session.commit()
+        self.gr_review_count += 1  # add review to count
+        self.sum_of_scores += score
+        self.average_score = (self.sum_of_scores / self.review_count)  # calculate new average
+
+
+def add_book(isbn, title, author, year=None):
+    """Creates a new Book object and adds it to the database"""
+    new_book = Book(isbn=isbn, title=title, author=author, year=year)
+    db.session.add(new_book)
+    db.session.commit() # insert the new book object to the database
+
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+    review_id = db.Column(db.Integer, primary_key=True)
+    book_isbn = db.Column(db.String, db.ForeignKey("books.isbn"), nullable=False)         # isbn of the reviewed book
+    user_id = db.Column(db.Integer, nullable=False)         # id of the user (reviewer)
+    score = db.Column(db.Integer, nullable=False)           # the user rates the book, rating on a scale of 1 to 5
+    text = db.Column(db.String)                             # the text review (optional)
+
+    def __init__(self, book_isbn, user_id, score, text):
+        # self.review_id   # get when inserted to db
+        self.book_isbn = book_isbn
+        self.user_id = user_id
+        self.score = score
+        self.text = text
 
 
 def  get_gr_reviews_data(isbn):
@@ -75,6 +108,9 @@ def  get_gr_reviews_data(isbn):
     if res.status_code == 404:
         return None, None
     json = res.json()
-    work_ratings_count = json["books"]["work_ratings_count"]
-    average_rating = json["books"]["average_rating"]
+    print("JSON FILE:" + str(json))
+    print("COUNT:" + str(json["books"][0]["work_ratings_count"]))
+    print("SCORE:" + str(json["books"][0]["average_rating"]))
+    work_ratings_count = int(json["books"][0]["work_ratings_count"])
+    average_rating = float(json["books"][0]["average_rating"])
     return work_ratings_count, average_rating
