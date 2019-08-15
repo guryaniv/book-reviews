@@ -3,8 +3,7 @@ import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
-from .models import User
-from flask import flash
+from .models import *
 
 app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
 
@@ -36,3 +35,9 @@ class SignupForm(FlaskForm):
         mail_exists = User.query.filter_by(email=email.data).first()
         if mail_exists is not None:
             raise ValidationError('Please use a different Email address.')
+
+
+class SearchForm(FlaskForm):
+    """form for the search page, where the user can search for a book by ISBN, title, or author"""
+    search = StringField('Search for a book...', validators=[DataRequired()])
+    submit = SubmitField('Search')

@@ -1,20 +1,36 @@
 from . import app
-from .forms import LoginForm, SignupForm
-from flask import render_template, flash, redirect, url_for
-from flask_login import current_user, login_user, logout_user
+from .forms import LoginForm, SignupForm, SearchForm
+from flask import render_template, flash, redirect, url_for, jsonify
+from flask_login import current_user, logout_user, login_required
 from .models import *
-from .config import basedir
-import os
 
 @app.route('/')
-@app.route('/index')
+@app.route('/search')
 def index():
     user = current_user
     if current_user.is_authenticated:
-        return render_template('index.html', title='Home', user=user)
+        form = SearchForm()
+        return render_template('search.html', title='Home', user=user, form=form)
     else:
         return redirect(url_for('login'))
 
+
+@app.route('/search_results')
+def search_results(search):
+    # TODO
+    results = []
+    search_string = search.data['search']
+
+    if search.data['search'] == '':
+        qry = db.query(Album)
+        results = qry.all()
+
+    if not results:
+        flash('No results found!')
+        return redirect('/')
+    else:
+        # display results
+        return render_template('results.html', results=results)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -67,30 +83,31 @@ def search_page():
       ISBN, or author name, your search page should find matches for those as well!"""
     # TODO
 
-@app.route("/books/<int:book_id>")
-def book_page():
-    """When users click on a book from the results of the search page, they should be taken to a book page,
-     with details about the book: its title, author, publication year, ISBN number, and any reviews that users
-      have left for the book on your website."""
+@app.route("/books/<int:isbn>")
+@login_required
+def book_page(isbn):
+    """page with the book's details and reviews, with an option to leave a new review"""
     # TODO
     """Review Submission: On the book page, users should be able to submit a review: consisting of a rating on
      a scale of 1 to 5, as well as a text component to the review where the user can write their opinion about a book.
       Users should not be able to submit multiple reviews for the same book."""
 
 @app.route("/api/<int:isbn>")
-def api_access():
-    """If users make a GET request to your website’s /api/<isbn> route, where <isbn> is an ISBN number, your website should
-     return a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average
-      score. The resulting JSON should follow the format:"""
-    # TODO
-    {
-        "title": "Memory",
-        "author": "Doug Lloyd",
-        "year": 2015,
-        "isbn": "1632168146",
-        "review_count": 28,
-        "average_score": 5.0
-    }
+def api_access(isbn):
+    """If users makes a GET request to my website’s /api/<isbn> route, where <isbn> is an ISBN number,
+     we return a JSON response with the book's details and rating"""
+    book = Book.query.get(isbn)
+    if book is None:
+        return jsonify({"error": "ISBN not found"}), 404
+    return jsonify({
+        "title": book.title,
+        "author": book.author,
+        "year": book.year,
+        "isbn": book.isbn,
+        "review_count": book.review_count,
+        "average_score": book.average_score
+    })
+
 
 @app.route('/testu')
 def testusers():

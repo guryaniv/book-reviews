@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Hi, {{ user.username }}!</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                    <!--<div class="my-notify-error"><i class="fas fa-exclamation"></i> {{ message }}</div>-->
+                {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.search.label }}<br>
+            {{ form.search(size=32) }} {{ form.submit() }}
+        </p>
+    </form>
+
+{% endblock %}
