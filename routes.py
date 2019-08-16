@@ -1,36 +1,51 @@
 from . import app
-from .forms import LoginForm, SignupForm, SearchForm
-from flask import render_template, flash, redirect, url_for, jsonify
+from .forms import LoginForm, SignupForm, SearchForm, ReviewForm
+from flask import render_template, flash, redirect, url_for, jsonify, request
 from flask_login import current_user, logout_user, login_required
 from .models import *
+from sqlalchemy import func
 
-@app.route('/')
-@app.route('/search')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def index():
     user = current_user
     if current_user.is_authenticated:
+        # if a user is logged in, he gets the search page
+        # where he can search for a book by ISBN, author or title
         form = SearchForm()
-        return render_template('search.html', title='Home', user=user, form=form)
+        if form.validate_on_submit():   # form was submitted and form validators are ok
+            return search_results(form) # get results
+        else:
+            return render_template('search.html', title='Home', user=user, form=form)
     else:
+        # user is not logged in, we require a login (or signup)
         return redirect(url_for('login'))
 
-
-@app.route('/search_results')
-def search_results(search):
-    # TODO
-    results = []
-    search_string = search.data['search']
-
-    if search.data['search'] == '':
-        qry = db.query(Album)
-        results = qry.all()
-
-    if not results:
-        flash('No results found!')
-        return redirect('/')
+@login_required
+@app.route('/search_results', methods=['GET'])
+def search_results(form):
+    """get search results according to the submitted search form"""
+    search_string = form.data['search']
+    search_string = search_string.lower()
+    if search_string == '': #empty search
+        return redirect(url_for('search'))
     else:
-        # display results
-        return render_template('results.html', results=results)
+        results=[]
+        # if the search_string is ISBN (or partial ISBN)
+        results.extend(Book.query.filter(func.lower(Book.isbn).contains(func.lower(search_string))).all())
+        # if the search_string is title (or partial title)
+        results.extend(Book.query.filter(func.lower(Book.title).contains(func.lower(search_string))).all())
+        # if the search_string is author (or partial author)
+        results.extend(Book.query.filter(func.lower(Book.author).contains(func.lower(search_string))).all())
+        if len(results) == 0:
+            flash("No results were found. Try again.")
+            return redirect(url_for('index'))
+        else:
+            if len(results) == 1:
+                line = "Is this the book you searched for?"
+            else:
+                line = "Is one of these the book you searched for?"
+            return render_template('results.html', results=results, line=line, title="Search Results")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -48,17 +63,12 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect(url_for('index'))
     else:   # form not valid on submit
-        return render_template('login.html', title='Sign In', form=form)
+        return render_template('login.html', title='Hello Stranger!', form=form)
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
-@app.route('/notlogged')
-def notlogged():
-    return render_template('notlogged.html', title='Hello Stranger!')
-
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -75,24 +85,33 @@ def signup():
         print(form.errors)
         return render_template('signup.html', title='Sign Up', form=form)
 
-@app.route('/search')
-def search_page():
-    """search for a book. Users should be able to type in the ISBN number of a book, the title of a book,
-    or the author of a book. After performing the search, your website should display a list of possible
-     matching results, or some sort of message if there were no matches. If the user typed in only part of a title,
-      ISBN, or author name, your search page should find matches for those as well!"""
-    # TODO
 
-@app.route("/books/<int:isbn>")
 @login_required
+@app.route("/books/<string:isbn>", methods=['GET','POST'])
 def book_page(isbn):
     """page with the book's details and reviews, with an option to leave a new review"""
-    # TODO
-    """Review Submission: On the book page, users should be able to submit a review: consisting of a rating on
-     a scale of 1 to 5, as well as a text component to the review where the user can write their opinion about a book.
-      Users should not be able to submit multiple reviews for the same book."""
+    # Make sure book exists
+    book = Book.query.get(isbn)
+    if book is None:
+        flash("No such book. Search again.")
+        return redirect(url_for('index'))
+    form = ReviewForm()
+    success = None
+    if form.validate_on_submit():
+        score = int(form.score.data)
+        text = form.text.data
+        user_name = current_user.username
+        success = book.add_review(user=user_name, score=score, text=text)
+        if not success:
+            flash("You can only rate a book once.")
+        else:
+            flash("Your review was added.")
+    # Get all book reviews
+    reviews = book.reviews
+    return render_template("book.html", book=book, reviews=reviews, form=form, title="Book Page", success=success)
 
-@app.route("/api/<int:isbn>")
+
+@app.route("/api/<string:isbn>")
 def api_access(isbn):
     """If users makes a GET request to my website’s /api/<isbn> route, where <isbn> is an ISBN number,
      we return a JSON response with the book's details and rating"""

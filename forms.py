@@ -1,7 +1,7 @@
 from . import app
 import os
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from .models import *
 
@@ -39,5 +39,11 @@ class SignupForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     """form for the search page, where the user can search for a book by ISBN, title, or author"""
-    search = StringField('Search for a book...', validators=[DataRequired()])
+    search = StringField('search', validators=[DataRequired()], render_kw={"placeholder": "Search for a book..."})
     submit = SubmitField('Search')
+
+class ReviewForm(FlaskForm):
+    score = RadioField('Choose a score for the book:', choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5')])
+    text = TextAreaField('What do you think about the book?', validators=[Length(max=140)],
+                         render_kw={"placeholder": "Share your thoughts..."})
+    submit = SubmitField('Submit Review')
