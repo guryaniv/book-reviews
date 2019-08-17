@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=True)
+    user_reviews = db.relationship("Review", backref="user_id", lazy=True)
 
     def __init__(self, form_username, form_password, form_email=None):
         # self.id   # get when inserted to db
@@ -52,6 +53,7 @@ class Book(db.Model):
     author = db.Column(db.String, nullable=False)
     year = db.Column(db.Integer)
     review_count = db.Column(db.Integer)
+    sum_of_scores = db.Column(db.Integer)
     average_score = db.Column(db.Float)
     gr_review_count = db.Column(db.Integer)
     gr_average_score = db.Column(db.Float)
@@ -68,14 +70,17 @@ class Book(db.Model):
         self.average_score = 0
         self.gr_review_count, self.gr_average_score = get_gr_reviews_data(isbn)
 
-    def add_review(self, user_id, score, text):
-        """Add a review for this book object"""
-        new_review = Review(book_id=self.id, user_id=user_id, score=score, text=text)
+    def add_review(self, user, score, text):
+        """Adds a review for this book object. returns true on success"""
+        if len(Review.query.filter_by(book_isbn=self.isbn, user=user).all()) > 0:
+            return False # user already rated this book
+        new_review = Review(book_isbn=self.isbn, user=user, score=score, text=text)
         db.session.add(new_review)
-        db.session.commit()
-        self.gr_review_count += 1  # add review to count
+        self.review_count += 1  # add review to count
         self.sum_of_scores += score
         self.average_score = (self.sum_of_scores / self.review_count)  # calculate new average
+        db.session.commit()
+        return True
 
 
 def add_book(isbn, title, author, year=None):
@@ -88,15 +93,15 @@ def add_book(isbn, title, author, year=None):
 class Review(db.Model):
     __tablename__ = "reviews"
     review_id = db.Column(db.Integer, primary_key=True)
-    book_isbn = db.Column(db.String, db.ForeignKey("books.isbn"), nullable=False)         # isbn of the reviewed book
-    user_id = db.Column(db.Integer, nullable=False)         # id of the user (reviewer)
+    book_isbn = db.Column(db.String, db.ForeignKey("books.isbn"), nullable=False)      # isbn of the reviewed book
+    user = db.Column(db.String, db.ForeignKey("users.username"), nullable=False)       # username of the user (reviewer)
     score = db.Column(db.Integer, nullable=False)           # the user rates the book, rating on a scale of 1 to 5
     text = db.Column(db.String)                             # the text review (optional)
 
-    def __init__(self, book_isbn, user_id, score, text):
+    def __init__(self, book_isbn, user, score, text):
         # self.review_id   # get when inserted to db
         self.book_isbn = book_isbn
-        self.user_id = user_id
+        self.user = user
         self.score = score
         self.text = text
 
