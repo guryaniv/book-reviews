@@ -7,20 +7,25 @@
             <title>NO TITLE</title>
         {% endif %}
         <script src="https://kit.fontawesome.com/6331baa32a.js"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     </head>
     <body>
         <div id="nav">
+            &nbsp;
             <a href="/">Home</a>
+            &nbsp;
             {% if current_user.is_anonymous %}
                 <a href="{{ url_for('login') }}">Login</a>
+                &nbsp;
                 <a href="{{ url_for('signup') }}">Signup</a>
             {% else %}
                 <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
         </div>
         <hr>
+        <div id="content">
         {% block content %}{% endblock %}
+        </div>
     </body>
 </html>
