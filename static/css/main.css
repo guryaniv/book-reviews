@@ -1,4 +1,10 @@
 
+#content {
+    padding: 2%;
+    margin: 2%;
+}
+
+
 .my-notify-info, .my-notify-success, .my-notify-warning, .my-notify-error {
     padding:10px;
     margin:10px 0;
