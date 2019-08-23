@@ -1,4 +1,4 @@
-from . import app
+from .application import app
 import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
@@ -28,7 +28,7 @@ class SignupForm(FlaskForm):
         """check if username already exists in the database"""
         user_exists = User.query.filter_by(username=username.data).first()
         if user_exists is not None:
-            raise ValidationError('Username already exists. Please use a different Username.')
+            raise ValidationError('Username already exists.')
 
     def validate_email(self, email):
         """check if email address already exists in the database"""
