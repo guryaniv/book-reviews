@@ -128,21 +128,7 @@ def api_access(isbn):
     })
 
 
-@app.route('/testu')
-def testusers():
-    users = User.query.all()
-    print(users)
-    return render_template("test.html", list=users, title="test")
-
-@app.route('/testb')
-def testbooks():
-    books = Book.query.all()
-    print(books)
-    return render_template("test.html", list=books, title="test")
-
-@app.route('/testapi')
-def testapi():
-    json = get_gr_reviews_data("0380795272")
-    book = json["books"]
-    return render_template("test.html", list=book, title="test")
+@app.route('/about')
+def about():
+    return render_template('about.html', title='About')
 

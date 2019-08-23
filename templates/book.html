@@ -2,7 +2,7 @@
 
 
 {% block content %}
-    <h1>Book Details</h1>
+    <h2>Book Details</h2>
 
     <div id="details">
         <ul>
@@ -14,7 +14,7 @@
     </div>
 
     <div id="reviews">
-        <h2>Reviews</h2>
+        <h3>Reviews</h3>
         <ul>
             <li>GoodReads Reviews Count: {{ book.gr_review_count }}</li>
             <li>GoodReads Average Score: {{ book.gr_average_score }}</li>
@@ -22,7 +22,7 @@
             <li>Average Score on Our Site: {{ book.average_score }}</li>
         </ul>
         {% if reviews %}
-            <h4>Users Reviews:</h4>
+            <h5>Users Reviews:</h5>
             <ul>
                 {% for review in reviews %}
                     <li>@{{ review.user }} rated:<br>
@@ -35,7 +35,7 @@
     </div>
 
     <div id="submit_review">
-        <h4>Submit a Review</h4>
+        <h5>Submit a Review</h5>
         <form action="" method="post" novalidate>
             {{ form.hidden_tag() }}
             {{ form.score.label }}<br>
@@ -65,7 +65,6 @@
                             {{ message }}
                         </div>
                     {% endif %}
-                    <!--<div class="my-notify-error"><i class="fas fa-exclamation"></i> {{ message }}</div>-->
                 {% endfor %}
         {% endif %}
     {% endwith %}
