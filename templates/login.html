@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Sign In</h1>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -9,7 +8,6 @@
                     <div class="alert alert-danger">
                         {{ message }}
                     </div>
-                    <!--<div class="my-notify-error"><i class="fas fa-exclamation"></i> {{ message }}</div>-->
                 {% endfor %}
         {% endif %}
     {% endwith %}
