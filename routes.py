@@ -1,4 +1,4 @@
-from . import app
+from .application import app
 from .forms import LoginForm, SignupForm, SearchForm, ReviewForm
 from flask import render_template, flash, redirect, url_for, jsonify, request
 from flask_login import current_user, logout_user, login_required
