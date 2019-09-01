@@ -1,11 +1,7 @@
-from app.application import app
-import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User
-
-app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
 
 class LoginForm(FlaskForm):
     """user login form generated using wtforms"""
