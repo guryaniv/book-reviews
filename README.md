@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/guryaniv/book-reviews/blob/master/static/img/logo.png" width="170" title="Book Reviews"></p>
+<p align="center"><img src="https://github.com/guryaniv/book-reviews/blob/master/app/static/img/logo.png" width="170" title="Book Reviews"></p>
 
 Project 1 for Harvard's CS50's Web Programming with Python and JavaScript Course, with some Extras.<br>
 See- [Project Instructions](https://docs.cs50.net/web/2019/x/projects/1/project1.html).
