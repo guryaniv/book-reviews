@@ -1,3 +1,4 @@
+Flask-Babel2
 sqlalchemy
 Flask
 Flask-Session
