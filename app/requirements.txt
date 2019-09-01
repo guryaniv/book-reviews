@@ -1,0 +1,11 @@
+sqlalchemy
+Flask
+Flask-Session
+psycopg2
+flask-sqlalchemy
+flask-login
+werkzeug
+wtforms
+requests
+psycopg2
+gunicorn
