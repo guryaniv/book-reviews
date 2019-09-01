@@ -2,8 +2,8 @@ import os
 import csv
 
 from flask import Flask
-from models import *
-# from flask_sqlalchemy import SQLAlchemy
+from app.models import Book
+from app import db
 
 #### RUN THIS FILE TO CREATE THE DATABASE TABLES AND IMPORT BOOKS FROM CSV ####
 

@@ -1,9 +1,9 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from . import login, db
+from app import login, db
 from flask_login import login_user
 import requests
-from . import goodreads_API_key
+from app import goodreads_API_key
 
 
 class User(UserMixin, db.Model):

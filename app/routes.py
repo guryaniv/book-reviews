@@ -1,8 +1,8 @@
-from .application import app
-from .forms import LoginForm, SignupForm, SearchForm, ReviewForm
-from flask import render_template, flash, redirect, url_for, jsonify, request
-from flask_login import current_user, logout_user, login_required
-from .models import *
+from app.application import app
+from app.forms import LoginForm, SignupForm, SearchForm, ReviewForm
+from flask import render_template, flash, redirect, url_for, jsonify
+from flask_login import current_user, logout_user, login_user, login_required
+from app.models import User, add_user, Book
 from sqlalchemy import func
 
 @app.route('/', methods=['GET', 'POST'])
