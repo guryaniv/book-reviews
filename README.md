@@ -16,9 +16,20 @@ Book-Reviews web app, created using flask, postgreSQL, Goodreads API.
   <li><Strong>API Access</strong>: If users make a GET request to the website’s /api/<isbn> route, where <isbn> is an ISBN number of a book, the website returns a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average score.</li>
 </ul>
 
-<h3>prerequisites:</h3>
+<h3>Prerequisites:</h3>
 
 See ```requirements.txt```.
+
+<h3>Run Instructions:</h3>
+
+To run on your machine:
+<ol>
+  <li> Clone the repository</li>
+  <li> Set an environment variable <code>FLASK_APP=book_reviews.py</code></li>
+  <li> Use the <code>flask run</code> command</li>
+<br>
+The app is deployed at:<br><a href="https://book-reviews-a.herokuapp.com/">https://book-reviews-a.herokuapp.com</a>
+  
 
 
 
