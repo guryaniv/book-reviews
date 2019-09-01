@@ -21,6 +21,3 @@ def create_app(config_class=Config):
     login.init_app(app)
 
     return app
-
-
-from app import routes, models
