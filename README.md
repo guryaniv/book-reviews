@@ -27,7 +27,8 @@ To run on your machine:
   <li> Clone the repository</li>
   <li> Set an environment variable <code>FLASK_APP=book_reviews.py</code></li>
   <li> Use the <code>flask run</code> command</li>
-<br>
+</ol>
+
 The app is deployed at:<br><a href="https://book-reviews-a.herokuapp.com/">https://book-reviews-a.herokuapp.com</a>
   
 
